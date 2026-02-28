@@ -25,6 +25,8 @@ import {
   Folder,
   ClipboardPaste,
   ExternalLink,
+  FileArchive,
+  FileAudio,
 } from "lucide-react";
 import { api } from "~/trpc/react";
 import { format } from "date-fns";
@@ -1506,8 +1508,22 @@ function formatFileSize(bytes: number): string {
 }
 
 function getAttachmentIcon(mimeType: string) {
-  if (mimeType.startsWith("image/")) return ImageIcon;
-  if (mimeType.startsWith("video/")) return FileVideo;
+  if (!mimeType) return FileText;
+  
+  const type = mimeType.toLowerCase();
+  if (type.startsWith("image/")) return ImageIcon;
+  if (type.startsWith("video/")) return FileVideo;
+  if (type.startsWith("audio/")) return FileAudio;
+  if (
+    type.includes("zip") || 
+    type.includes("tar") || 
+    type.includes("rar") ||
+    type.includes("7z") ||
+    type.includes("compressed")
+  ) {
+    return FileArchive;
+  }
+  
   return FileText;
 }
 
