@@ -4,6 +4,9 @@ import { s3Client, BUCKET, getS3Key, getPublicUrl } from "~/server/s3";
 
 const MAX_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024;
 
+// Next.js App Router body size limit config
+export const maxDuration = 60; // Allow more time for large uploads
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
