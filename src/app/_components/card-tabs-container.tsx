@@ -161,51 +161,50 @@ export function CardTabsContainer({ card }: CardTabsContainerProps) {
   };
 
   return (
-    <div className="mt-5 rounded-xl border border-gray-200 p-4">
-      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm font-semibold text-gray-700">Card Tabs</p>
-        <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs sm:text-sm">
+    <div className="mt-5 w-full rounded-xl border border-gray-200 bg-white p-3 sm:p-4">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm font-bold text-gray-700">Card Tabs</p>
+        <div className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-1 sm:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab("discussion")}
-            className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
+            className={`flex-1 rounded-md px-2 py-1.5 text-center font-medium transition-colors sm:flex-none sm:px-4 ${
               activeTab === "discussion"
-                ? "bg-violet-600 text-white"
+                ? "bg-violet-600 text-white shadow-sm"
                 : "text-gray-600 hover:bg-white hover:text-violet-600"
-            }`}
+            } text-xs sm:text-sm`}
           >
             Discussion
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("calendar")}
-            className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
+            className={`flex-1 rounded-md px-2 py-1.5 text-center font-medium transition-colors sm:flex-none sm:px-4 ${
               activeTab === "calendar"
-                ? "bg-violet-600 text-white"
+                ? "bg-violet-600 text-white shadow-sm"
                 : "text-gray-600 hover:bg-white hover:text-violet-600"
-            }`}
+            } text-xs sm:text-sm`}
           >
             Calendar
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("expense")}
-            className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
+            className={`flex-1 rounded-md px-2 py-1.5 text-center font-medium transition-colors sm:flex-none sm:px-4 ${
               activeTab === "expense"
-                ? "bg-violet-600 text-white"
+                ? "bg-violet-600 text-white shadow-sm"
                 : "text-gray-600 hover:bg-white hover:text-violet-600"
-            }`}
+            } text-xs sm:text-sm`}
           >
             Expense
           </button>
         </div>
       </div>
 
-      {activeTab === "discussion" ? (
-        <div className="space-y-4">
-          <CardDiscussion cardId={card.id} />
-        </div>
-      ) : activeTab === "calendar" ? (
+      <div className="mt-2 min-h-[200px]">
+        {activeTab === "discussion" ? (
+          <CardDiscussion cardId={card.id} hideHeader={true} />
+        ) : activeTab === "calendar" ? (
         <div className="space-y-4">
           <p className="text-xs text-gray-500">
             Add events with dates, times, and notes. Events are sorted chronologically.
