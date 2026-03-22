@@ -284,7 +284,7 @@ function PostComposer({
   );
 }
 
-export function CardDiscussion({ cardId }: { cardId: number }) {
+export function CardDiscussion({ cardId, hideHeader = false }: { cardId: number; hideHeader?: boolean }) {
   const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
   const utils = api.useUtils();
 
@@ -313,12 +313,14 @@ export function CardDiscussion({ cardId }: { cardId: number }) {
     setReplyTargetId(null);
   };
 
-  return (
-    <section className="mt-8 space-y-4 rounded-2xl border border-gray-200 bg-white p-5">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Discussion</h2>
-        <p className="text-sm text-gray-500">Post updates, answer, and attach files or links.</p>
-      </div>
+  const content = (
+    <div className="space-y-4">
+      {!hideHeader && (
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Discussion</h2>
+          <p className="text-sm text-gray-500">Post updates, answer, and attach files or links.</p>
+        </div>
+      )}
 
       <PostComposer
         onSubmit={handleCreatePost}
@@ -390,6 +392,16 @@ export function CardDiscussion({ cardId }: { cardId: number }) {
           })}
         </div>
       )}
+    </div>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
+  return (
+    <section className="mt-8 space-y-4 rounded-2xl border border-gray-200 bg-white p-5">
+      {content}
     </section>
   );
 }
