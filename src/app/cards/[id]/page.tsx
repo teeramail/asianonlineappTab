@@ -6,6 +6,8 @@ import { CardTabsContainer } from "~/app/_components/card-tabs-container";
 import { db } from "~/server/db";
 import { studyCards } from "~/server/db/schema";
 
+// Force fresh build: 2024-05-20-v2
+
 export const dynamic = "force-dynamic";
 
 function getYoutubeEmbedUrl(url: string) {
