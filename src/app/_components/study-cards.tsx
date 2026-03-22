@@ -831,13 +831,13 @@ function StudyCardDetailModal({ card, onClose }: StudyCardDetailModalProps) {
         )}
 
         <div className="mt-5 rounded-xl border border-gray-200 p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-semibold text-gray-700">Card Tabs</p>
-            <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1 text-sm">
+            <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs sm:text-sm">
               <button
                 type="button"
                 onClick={() => setActiveTab("discussion")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
                   activeTab === "discussion"
                     ? "bg-violet-600 text-white"
                     : "text-gray-600 hover:bg-white hover:text-violet-600"
@@ -848,18 +848,18 @@ function StudyCardDetailModal({ card, onClose }: StudyCardDetailModalProps) {
               <button
                 type="button"
                 onClick={() => setActiveTab("group-calendar")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
                   activeTab === "group-calendar"
                     ? "bg-violet-600 text-white"
                     : "text-gray-600 hover:bg-white hover:text-violet-600"
                 }`}
               >
-                Group Calendar
+                Calendar
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("expense")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                className={`rounded-md px-2 py-1.5 font-medium transition-colors sm:px-3 ${
                   activeTab === "expense"
                     ? "bg-violet-600 text-white"
                     : "text-gray-600 hover:bg-white hover:text-violet-600"
