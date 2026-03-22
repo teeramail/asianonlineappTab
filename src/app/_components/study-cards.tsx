@@ -479,7 +479,6 @@ export function StudyCards() {
     </div>
   );
 }
-
 interface StudyCardDetailModalProps {
   card: any;
   onClose: () => void;
@@ -498,16 +497,7 @@ function StudyCardDetailModal({ card, onClose }: StudyCardDetailModalProps) {
       originalName: att.originalName,
       fileSize: att.fileSize,
     }));
-  const galleryImages = [...cardImages];
-  if (card.imageUrl && !galleryImages.some((img) => img.s3Key === card.imageS3Key || img.imageUrl === card.imageUrl)) {
-    galleryImages.unshift({
-      s3Key: card.imageS3Key ?? card.imageUrl,
-      imageUrl: card.imageUrl,
-      subfolder: "study-cards/images",
-      originalName: "Card image",
-      fileSize: 0,
-    });
-  }
+  const galleryImages = cardImages;
 
   const embedUrl = card.youtubeUrl ? getYoutubeEmbedUrl(card.youtubeUrl) : null;
 
@@ -519,12 +509,40 @@ function StudyCardDetailModal({ card, onClose }: StudyCardDetailModalProps) {
   const [attUploading, setAttUploading] = useState(false);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [activeTab, setActiveTab] = useState<"group-calendar" | "expense">("group-calendar");
+  const [groupCalendarText, setGroupCalendarText] = useState(card.groupCalendar ?? "");
+  const [expenseText, setExpenseText] = useState(card.expenses ?? "");
+  const [savingTab, setSavingTab] = useState<"group-calendar" | "expense" | null>(null);
 
   const utils = api.useUtils();
   const updateCard = api.studyCards.update.useMutation({
     onSuccess: () => { void utils.studyCards.getAll.invalidate(); },
   });
   const deleteAttFile = api.studyCards.deleteAttachmentFile.useMutation();
+
+  const saveGroupCalendar = async () => {
+    setSavingTab("group-calendar");
+    try {
+      await updateCard.mutateAsync({
+        id: card.id as number,
+        groupCalendar: groupCalendarText,
+      });
+    } finally {
+      setSavingTab(null);
+    }
+  };
+
+  const saveExpense = async () => {
+    setSavingTab("expense");
+    try {
+      await updateCard.mutateAsync({
+        id: card.id as number,
+        expenses: expenseText,
+      });
+    } finally {
+      setSavingTab(null);
+    }
+  };
 
   const persistAttachments = (next: Attachment[]) => {
     const all = [...cardImgAttachments.current, ...next];
@@ -710,6 +728,86 @@ function StudyCardDetailModal({ card, onClose }: StudyCardDetailModalProps) {
           </div>
         )}
 
+        <div className="mt-5 rounded-xl border border-gray-200 p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-gray-700">Card Tabs</p>
+            <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1 text-sm">
+              <button
+                type="button"
+                onClick={() => setActiveTab("group-calendar")}
+                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                  activeTab === "group-calendar"
+                    ? "bg-violet-600 text-white"
+                    : "text-gray-600 hover:bg-white hover:text-violet-600"
+                }`}
+              >
+                Group Calendar
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("expense")}
+                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                  activeTab === "expense"
+                    ? "bg-violet-600 text-white"
+                    : "text-gray-600 hover:bg-white hover:text-violet-600"
+                }`}
+              >
+                Expense
+              </button>
+            </div>
+          </div>
+
+          {activeTab === "group-calendar" ? (
+            <div className="space-y-3">
+              <p className="text-xs text-gray-500">
+                Keep the group schedule for this card here. It stays attached to this card only.
+              </p>
+              <textarea
+                value={groupCalendarText}
+                onChange={(e) => setGroupCalendarText(e.target.value)}
+                placeholder="Add meeting dates, deadlines, reminders, and any group calendar notes..."
+                rows={6}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void saveGroupCalendar()}
+                  disabled={savingTab === "group-calendar" || updateCard.isPending}
+                  className="flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingTab === "group-calendar" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Save Calendar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-gray-500">
+                Track card-specific expenses here. This is saved with the card, not the project.
+              </p>
+              <textarea
+                value={expenseText}
+                onChange={(e) => setExpenseText(e.target.value)}
+                placeholder="Add expense items, amounts, payment notes, and budget details..."
+                rows={6}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void saveExpense()}
+                  disabled={savingTab === "expense" || updateCard.isPending}
+                  className="flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingTab === "expense" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Save Expense
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ── Main Card Attachments ── */}
         <div className="mt-5 rounded-xl border border-gray-200 p-4">
           <div className="mb-3 flex items-center justify-between">
@@ -884,6 +982,8 @@ function StudyCard({
   const [imageUploading, setImageUploading] = useState(false);
   const [imageSubfolder, setImageSubfolder] = useState("study-cards/images");
   const [isEditImageDragOver, setIsEditImageDragOver] = useState(false);
+  const [groupCalendar, setGroupCalendar] = useState(card.groupCalendar ?? "");
+  const [expenses, setExpenses] = useState(card.expenses ?? "");
 
   // Parse attachments
   const parsedAttachments: Attachment[] = card.attachments ? JSON.parse(card.attachments) : [];
@@ -1440,6 +1540,28 @@ function StudyCard({
             rows={2}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
           />
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Group Calendar</label>
+              <textarea
+                value={groupCalendar}
+                onChange={(e) => setGroupCalendar(e.target.value)}
+                placeholder="Group meeting dates, deadlines, reminders..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Expense</label>
+              <textarea
+                value={expenses}
+                onChange={(e) => setExpenses(e.target.value)}
+                placeholder="Card-specific expenses, amounts, payment notes..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
+          </div>
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2">
               <input
@@ -1828,6 +1950,8 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
   const [tags, setTags] = useState("");
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
   const [notes, setNotes] = useState("");
+  const [groupCalendar, setGroupCalendar] = useState("");
+  const [expenses, setExpenses] = useState("");
   const [estimatedCost, setEstimatedCost] = useState<number | "">("");
   const [investDate, setInvestDate] = useState("");
   const [subfolder, setSubfolder] = useState("study-cards/images");
@@ -2108,6 +2232,8 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
       difficulty,
       tags: tags.trim() || undefined,
       notes: notes.trim() || undefined,
+      groupCalendar: groupCalendar.trim() || undefined,
+      expenses: expenses.trim() || undefined,
       estimatedCost: estimatedCost === "" ? undefined : Number(estimatedCost),
       investDate: investDate || undefined,
     });
@@ -2484,6 +2610,33 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
               rows={3}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
             />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Group Calendar
+              </label>
+              <textarea
+                value={groupCalendar}
+                onChange={(e) => setGroupCalendar(e.target.value)}
+                placeholder="Group schedule, deadlines, reminders..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Expense
+              </label>
+              <textarea
+                value={expenses}
+                onChange={(e) => setExpenses(e.target.value)}
+                placeholder="Card-specific expenses and payment notes..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

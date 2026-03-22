@@ -13,6 +13,8 @@ export const studyCards = createTable(
     imageUrl: d.varchar({ length: 2048 }),
     imageS3Key: d.varchar({ length: 1024 }),
     attachments: d.text(),
+    groupCalendar: d.text(),
+    expenses: d.text(),
     category: d.varchar({ length: 100 }),
     difficulty: d.varchar({ length: 20 }).default("medium"),
     tags: d.text(),
