@@ -37,88 +37,6 @@ import { CardTabsContainer } from "./card-tabs-container";
 import { format } from "date-fns";
 import { CardDiscussion } from "./card-discussion";
 
-const SUBJECT_TAG_SUGGESTIONS = [
-  "physics",
-  "classical mechanics",
-  "kinematics",
-  "dynamics",
-  "electricity",
-  "electromagnetism",
-  "electrostatics",
-  "circuits",
-  "optics",
-  "thermodynamics",
-  "waves",
-  "sound",
-  "fluid mechanics",
-  "quantum physics",
-  "atomic physics",
-  "nuclear physics",
-  "relativity",
-  "astrophysics",
-  "algebra",
-  "linear algebra",
-  "geometry",
-  "trigonometry",
-  "calculus",
-  "statistics",
-  "probability",
-  "number theory",
-  "discrete math",
-  "arithmetic",
-  "chemistry",
-  "organic chemistry",
-  "inorganic chemistry",
-  "physical chemistry",
-  "analytical chemistry",
-  "biochemistry",
-  "biology",
-  "botany",
-  "zoology",
-  "genetics",
-  "microbiology",
-  "ecology",
-  "human anatomy",
-  "physiology",
-  "neuroscience",
-  "marine biology",
-  "oceanography",
-  "earth science",
-  "geology",
-  "meteorology",
-  "astronomy",
-  "space science",
-  "coding",
-  "computer science",
-  "programming",
-  "algorithms",
-  "data structures",
-  "web development",
-  "cybersecurity",
-  "ai",
-  "machine learning",
-  "data science",
-  "robotics",
-  "history",
-  "world history",
-  "geography",
-  "economics",
-  "civics",
-  "english",
-  "reading",
-  "writing",
-  "vocabulary",
-  "grammar",
-  "literature",
-  "public speaking",
-  "music",
-  "art",
-  "drawing",
-  "design",
-  "critical thinking",
-  "problem solving",
-];
-
 function getYoutubeEmbedUrl(url: string) {
   try {
     const parsed = new URL(url);
@@ -965,7 +883,6 @@ function StudyCard({
   const [category, setCategory] = useState(card.category ?? "");
   const [difficulty, setDifficulty] = useState(card.difficulty ?? "medium");
   const [tags, setTags] = useState(card.tags ?? "");
-  const [showEditTagSuggestions, setShowEditTagSuggestions] = useState(false);
   const [notes, setNotes] = useState(card.notes ?? "");
   const [isCompleted, setIsCompleted] = useState(card.isCompleted);
   const [rating, setRating] = useState(card.rating ?? 0);
@@ -1013,27 +930,6 @@ function StudyCard({
     return images.slice(0, MAX_CARD_IMAGES);
   });
 
-  const currentEditTagToken = tags.split(",").at(-1)?.trimStart() ?? "";
-  const selectedEditTags = tags
-    .split(",")
-    .map((t: string) => t.trim().toLowerCase())
-    .filter(Boolean);
-  const suggestedEditTags = SUBJECT_TAG_SUGGESTIONS.filter(
-    (tag) =>
-      tag.toLowerCase().includes(currentEditTagToken.toLowerCase()) &&
-      !selectedEditTags.includes(tag.toLowerCase()),
-  ).slice(0, 20);
-
-  const applyEditTagSuggestion = (tag: string) => {
-    const committedTags = tags
-      .split(",")
-      .slice(0, -1)
-      .map((t: string) => t.trim())
-      .filter(Boolean);
-    const nextTags = [...committedTags, tag];
-    setTags(`${nextTags.join(", ")}, `);
-    setShowEditTagSuggestions(false);
-  };
 
   const uploadEditedImage = async (file: File) => {
     setImageUploading(true);
@@ -1488,41 +1384,14 @@ function StudyCard({
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Tags</label>
-            <div className="relative">
-              <input
-                value={tags}
-                onChange={(e) => {
-                  setTags(e.target.value);
-                  setShowEditTagSuggestions(true);
-                }}
-                onFocus={() => setShowEditTagSuggestions(true)}
-                onBlur={() => {
-                  setTimeout(() => setShowEditTagSuggestions(false), 120);
-                }}
-                placeholder="algebra, electricity, botany, oceanography"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
-              />
-
-              {showEditTagSuggestions && suggestedEditTags.length > 0 && (
-                <div className="absolute z-10 mt-1 max-h-44 w-full overflow-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-                  {suggestedEditTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        applyEditTagSuggestion(tag);
-                      }}
-                      className="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-violet-50"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <input
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="algebra, electricity, botany, oceanography"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            />
             <p className="mt-1 text-xs text-gray-400">
-              Add many tags with comma separation. You can pick suggestions or type your own.
+              Add many tags with comma separation.
             </p>
           </div>
           <textarea
@@ -1940,7 +1809,6 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
   const [category, setCategory] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [tags, setTags] = useState("");
-  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
   const [notes, setNotes] = useState("");
   const [groupCalendar, setGroupCalendar] = useState("");
   const [expenses, setExpenses] = useState("");
@@ -1959,27 +1827,6 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
   const [attachmentLinkUrl, setAttachmentLinkUrl] = useState("");
   const [attachmentLinkName, setAttachmentLinkName] = useState("");
 
-  const currentTagToken = tags.split(",").at(-1)?.trimStart() ?? "";
-  const selectedTags = tags
-    .split(",")
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
-  const suggestedTags = SUBJECT_TAG_SUGGESTIONS.filter(
-    (tag) =>
-      tag.toLowerCase().includes(currentTagToken.toLowerCase()) &&
-      !selectedTags.includes(tag.toLowerCase()),
-  ).slice(0, 20);
-
-  const applyTagSuggestion = (tag: string) => {
-    const committedTags = tags
-      .split(",")
-      .slice(0, -1)
-      .map((t) => t.trim())
-      .filter(Boolean);
-    const nextTags = [...committedTags, tag];
-    setTags(`${nextTags.join(", ")}, `);
-    setShowTagSuggestions(false);
-  };
 
   // Handle clipboard paste
   const handlePaste = useCallback(async (e: ClipboardEvent) => {
@@ -2553,41 +2400,14 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Tags
             </label>
-            <div className="relative">
-              <input
-                value={tags}
-                onChange={(e) => {
-                  setTags(e.target.value);
-                  setShowTagSuggestions(true);
-                }}
-                onFocus={() => setShowTagSuggestions(true)}
-                onBlur={() => {
-                  setTimeout(() => setShowTagSuggestions(false), 120);
-                }}
-                placeholder="algebra, electricity, botany, oceanography"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
-              />
-
-              {showTagSuggestions && suggestedTags.length > 0 && (
-                <div className="absolute z-10 mt-1 max-h-44 w-full overflow-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-                  {suggestedTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        applyTagSuggestion(tag);
-                      }}
-                      className="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-violet-50"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <input
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="algebra, electricity, botany, oceanography"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            />
             <p className="mt-1 text-xs text-gray-400">
-              Suggestions appear as you type. Add as many tags as you want (comma-separated), including custom tags.
+              Add as many tags as you want (comma-separated).
             </p>
           </div>
 
