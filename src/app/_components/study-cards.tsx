@@ -2013,14 +2013,22 @@ function CreateCardForm({ onClose, onSubmit, isSubmitting }: CreateCardFormProps
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description *
             </label>
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              onInput={(e) => setDescription((e.currentTarget as HTMLDivElement).innerHTML)}
-              dangerouslySetInnerHTML={{ __html: getDescriptionEditorHtml(description) }}
-              className="min-h-28 whitespace-pre-wrap rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onPaste={(e) => {
+                const html = e.clipboardData.getData("text/html");
+                if (html) {
+                  e.preventDefault();
+                  setDescription(html);
+                }
+              }}
+              placeholder="Enter description or paste rich text..."
+              rows={4}
+              className="w-full whitespace-pre-wrap rounded-lg border border-gray-300 px-3 py-2 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              required
             />
-            <p className="mt-1 text-xs text-gray-500">Paste or type rich text to preserve colors and paragraph spacing.</p>
+            <p className="mt-1 text-xs text-gray-500">Paste rich text to preserve colors and paragraph spacing.</p>
           </div>
 
           {/* Card Image Upload with Subfolder & Clipboard Paste */}
